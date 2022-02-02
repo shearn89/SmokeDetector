@@ -625,6 +625,9 @@ items:
   - heather.ns.cloudflare.com.
 - ns:
   - dean.ns.cloudflare.com.
+  - sharon.ns.cloudflare.com.
+- ns:
+  - dean.ns.cloudflare.com.
   - sofia.ns.cloudflare.com.
 - ns:
   - dean.ns.cloudflare.com.
@@ -674,6 +677,9 @@ items:
 - ns:
   - dilbert.ns.cloudflare.com.
   - mimi.ns.cloudflare.com.
+- ns:
+  - dina.ns.cloudflare.com.
+  - mario.ns.cloudflare.com.
 - ns:
   - dolly.ns.cloudflare.com.
   - hans.ns.cloudflare.com.
@@ -910,6 +916,9 @@ items:
 - ns:
   - hugh.ns.cloudflare.com.
   - lina.ns.cloudflare.com.
+- ns:
+  - hugh.ns.cloudflare.com.
+  - tani.ns.cloudflare.com.
 - ns:
   - hal.ns.cloudflare.com.
   - tia.ns.cloudflare.com.
@@ -2186,3 +2195,4 @@ items:
 - ns: lcn.com.
 - ns: linuxhostinginindia.com.
 - ns: sify.net.
+- ns: sunnysidehosting.com.
