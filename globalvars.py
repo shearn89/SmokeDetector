@@ -2,6 +2,8 @@
 
 import sys
 import os
+import boto3
+import botocore.exceptions
 from collections import namedtuple
 from datetime import datetime
 from html.parser import HTMLParser
@@ -29,6 +31,13 @@ git_user_repo = "Charcoal-SE/SmokeDetector"
 if git_url[0:19] == "https://github.com/":
     git_user_repo = "{}/{}".format(git_url_split[3], git_url_split[4][0:-4])
 
+ssm = boto3.client("ssm")
+def get_ssm_parameter(parameter_name):
+    parameter = ssm.get_parameter(
+            Name=parameter_name,
+            WithDecryption=True
+    )
+    return parameter['Parameter']['Value'].strip()
 
 def git_commit_info():
     try:
@@ -43,7 +52,6 @@ def git_commit_info():
 def git_ref():
     git_cp = sp.run(['git', 'symbolic-ref', '--short', '-q', 'HEAD'], stdout=sp.PIPE)
     return git_cp.stdout.decode("utf-8").strip()  # not on branch = empty output
-
 
 # We don't need strip_escape_chars() anymore, see commit message
 # of 1931d30804a675df07887ce0466e558167feae57
@@ -266,20 +274,46 @@ class GlobalVars:
                 GlobalVars.MSStatus.ms_is_up = True
                 GlobalVars.MSStatus.counter = 0
 
-    chatexchange_u = config.get("ChatExchangeU")
-    chatexchange_p = config.get("ChatExchangeP")
+    def get_config_value(config, key):
+        """ get config variables from a secret store, or environment, or config file """
+        if key in os.environ:
+            print(f"found {key} in env")
+            return os.environ[key]
+        elif config.get(key):
+            if config.get("secret_store") == "aws-ssm":
+                ssm_key = config.get(key)
+                print(f"found {key} as secret in config, attempting ssm call")
+                try:
+                    return get_ssm_parameter(ssm_key)
+                except botocore.exceptions.ClientError as error:
+                    if error.response['Error']['Code'] == 'ParameterNotFound':
+                        print("parameter not found in SSM, continuing")
+                    elif error.response['Error']['Code'] == 'ValidationException':
+                        print("parameter name invalid, continuing")
+                    else:
+                        print(error)
+            print(f"found {key} in config")
+            return config.get(key)
+        return None
+
+    # sensitive variables
+    chatexchange_u = get_config_value(config, 'ChatExchangeU')
+    chatexchange_p = get_config_value(config, 'ChatExchangeP')
+    metasmoke_key = get_config_value(config, "metasmoke_key")
 
     metasmoke_host = config.get("metasmoke_host")
-    metasmoke_key = config.get("metasmoke_key")
     metasmoke_ws_host = config.get("metasmoke_ws_host")
 
     git_name = config.get("git_username", "SmokeDetector")
     git_email = config.get("git_useremail", "smokey@erwaysoftware.com")
 
     github_username = config.get("github_username")
+    # TODO: get these from SSM
     github_password = config.get("github_password")
+    # TODO: get these from SSM
     github_access_token = config.get("github_access_token")
 
+    # TODO: get these from SSM
     perspective_key = config.get("perspective_key")
 
     flovis_host = config.get("flovis_host")

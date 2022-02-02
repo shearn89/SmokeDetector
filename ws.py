@@ -155,20 +155,14 @@ except TldIOError as ioerr:
         err_msg = strerror
     log_exception(type(ioerr), ioerr, err_msg, True, level="warning")
 
-if "ChatExchangeU" in os.environ:
-    log('debug', "ChatExchange username loaded from environment")
-    username = os.environ["ChatExchangeU"]
-elif GlobalVars.chatexchange_u:
+if GlobalVars.chatexchange_u:
     log('debug', "ChatExchange username loaded from config")
     username = GlobalVars.chatexchange_u
 else:
     log('error', "No ChatExchange username provided. Set it in config or provide it via environment variable")
     exit_mode("shutdown")
 
-if "ChatExchangeP" in os.environ:
-    log('debug', "ChatExchange password loaded from environment")
-    password = os.environ["ChatExchangeP"]
-elif GlobalVars.chatexchange_p:
+if GlobalVars.chatexchange_p:
     log('debug', "ChatExchange password loaded from config")
     password = GlobalVars.chatexchange_p
 else:
